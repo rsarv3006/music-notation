@@ -6,7 +6,7 @@
 //	Copyright © 2015 Kyle Sherman. All rights reserved.
 //
 
-public struct TimeSignature {
+public class TimeSignature {
 	public let topNumber: Int
 	public let bottomNumber: Int
 	public let tempo: Int

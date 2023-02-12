@@ -7,9 +7,9 @@
 //
 
 public class TimeSignature {
-	public let topNumber: Int
-	public let bottomNumber: Int
-	public let tempo: Int
+	public var topNumber: Int
+    public var bottomNumber: Int
+    public var tempo: Int
 
 	public init(topNumber: Int, bottomNumber: Int, tempo: Int) {
 		// TODO: Check the validity of all these values

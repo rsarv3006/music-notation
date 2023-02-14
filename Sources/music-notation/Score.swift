@@ -8,7 +8,7 @@
 
 /// A `score` can contain 0 or more parts. Each part can have a name, color, and position within the score.
 /// A `score` will also be the container for stylesheets, as well as overall data for the entire score.
-public struct Score: RandomAccessCollection {
+public class Score: RandomAccessCollection {
 	// MARK: - Collection Conformance
 
 	public typealias Index = Int

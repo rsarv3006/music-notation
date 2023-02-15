@@ -6,6 +6,8 @@
 //	Copyright © 2021 Steven Woolgar. All rights reserved.
 //
 
+import Foundation
+
 /// A `score` can contain 0 or more parts. Each part can have a name, color, and position within the score.
 /// A `score` will also be the container for stylesheets, as well as overall data for the entire score.
 public class Score: RandomAccessCollection {
@@ -23,7 +25,7 @@ public class Score: RandomAccessCollection {
 	// MARK: - Main Properties
 
 	internal private(set) var parts: [Part] = []
-	public var title: String = ""
+	@Published public var title: String = ""
 	public var subTitle: String = ""
 	public var artist: String = ""
 	public var album: String = ""

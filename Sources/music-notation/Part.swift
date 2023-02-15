@@ -6,10 +6,8 @@
 //	Copyright © 2021 Steven Woolgar. All rights reserved.
 //
 
-import Foundation
-
 /// Placeholder for eventual staff layout description of a page footer.
-public class Part {
+public struct Part {
 	// MARK: - Collection Conformance
 
 	public typealias Index = Int
@@ -23,10 +21,10 @@ public class Part {
 
 	// MARK: - Main Properties
 
-	@Published public var name: String = ""
-    @Published public var shortName: String = ""
+	public let name: String
+    public let shortName: String
 
-    @Published internal private(set) var staves: [Staff] = []
+    internal private(set) var staves: [Staff] = []
 
 	public init(
 		name: String = "",
@@ -34,6 +32,8 @@ public class Part {
 		staves: [Staff]
 	) {
 		self.staves = staves
+        self.name = name
+        self.shortName = shortName
 	}
 }
 
@@ -44,5 +44,3 @@ extension Part: CustomDebugStringConvertible {
 		return "staves(\(stavesDescription))"
 	}
 }
-
-extension Part: ObservableObject {}

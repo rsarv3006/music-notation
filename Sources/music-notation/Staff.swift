@@ -5,8 +5,9 @@
 //	Created by Kyle Sherman on 2015-06-15.
 //	Copyright © 2015 Kyle Sherman. All rights reserved.
 //
+import Foundation
 
-public struct Staff: RandomAccessCollection {
+public class Staff: RandomAccessCollection {
 	// MARK: - Collection Conformance
 
 	public typealias Index = Int
@@ -26,7 +27,7 @@ public struct Staff: RandomAccessCollection {
 	public let instrument: Instrument
 	public private(set) var measureCount: Int = 0
 
-	internal private(set) var notesHolders: [NotesHolder] = [] {
+	@Published internal private(set) var notesHolders: [NotesHolder] = [] {
 		didSet { recomputeMeasureIndexes() }
 	}
 
@@ -40,7 +41,7 @@ public struct Staff: RandomAccessCollection {
 		self.instrument = instrument
 	}
 
-	public mutating func appendMeasure(_ measure: Measure) {
+	public func appendMeasure(_ measure: Measure) {
 		let measureBefore = try? self.measure(at: lastIndex)
 		let clefChange = measureBefore?.lastClef ?? clef
 		var measure = measure
@@ -49,7 +50,7 @@ public struct Staff: RandomAccessCollection {
 		measureCount += measure.measureCount
 	}
 
-	public mutating func appendRepeat(_ measureRepeat: MeasureRepeat) {
+	public func appendRepeat(_ measureRepeat: MeasureRepeat) {
 		var measureRepeat = measureRepeat
 		let measureBefore = try? measure(at: lastIndex)
 		for index in measureRepeat.measures.indices {
@@ -71,7 +72,7 @@ public struct Staff: RandomAccessCollection {
 	///	  - `StaffError.repeatedMeasureCannotBeModified` if the measure is a repeated measure.
 	///	  - `StaffError.internalError` if the function has an internal implementation error.
 	///
-	public mutating func changeClef(
+	public func changeClef(
 		_ clef: Clef,
 		in measureIndex: Int,
 		atNote noteIndex: Int,
@@ -112,7 +113,7 @@ public struct Staff: RandomAccessCollection {
 	///	   - `MeasureRepeatError.indexOutOfRange`
 	///	   - `MeasureRepeatError.cannotModifyRepeatedMeasures`
 	///
-	public mutating func insertMeasure(_ measure: Measure, at index: Int, beforeRepeat: Bool = true) throws {
+	public func insertMeasure(_ measure: Measure, at index: Int, beforeRepeat: Bool = true) throws {
 		var measure = measure
 		let measureBefore = try? self.measure(at: index - 1)
 		let clefChange = measureBefore?.lastClef ?? clef
@@ -153,7 +154,7 @@ public struct Staff: RandomAccessCollection {
 	///	   - `StaffError.measureIndexOutOfRange`
 	///	   - `StaffError.cannotInsertRepeatWhereOneAlreadyExists`
 	///
-	public mutating func insertRepeat(_ measureRepeat: MeasureRepeat, at index: Int) throws {
+	public func insertRepeat(_ measureRepeat: MeasureRepeat, at index: Int) throws {
 		var measureRepeat = measureRepeat
 		let measureBefore = try? measure(at: index - 1)
 		var didChangeClef = true
@@ -181,7 +182,7 @@ public struct Staff: RandomAccessCollection {
 	///	   - `StaffError.repeatedMeasureCannotBeModified` if the measure is a repeated measure.
 	///	   - `StaffError.internalError` if index translation doesn't work properly.
 	///
-	public mutating func replaceMeasure(at measureIndex: Int, with newMeasure: Measure) throws {
+	public func replaceMeasure(at measureIndex: Int, with newMeasure: Measure) throws {
 		try replaceMeasure(at: measureIndex, with: newMeasure, shouldChangeClef: true)
 	}
 
@@ -201,7 +202,7 @@ public struct Staff: RandomAccessCollection {
 	///	   - `StaffError.internalError`, `MeasureError.internalError` if the function has an internal implementation error.
 	///	   - `MeasureError.noteIndexOutOfRange`
 	///
-	public mutating func startTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
+	public func startTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
 		try modifyTieForNote(at: noteIndex, inMeasureAt: measureIndex, removeTie: false, inSet: setIndex)
 	}
 
@@ -221,7 +222,7 @@ public struct Staff: RandomAccessCollection {
 	///	   - `MeasureError.noteIndexOutOfRange`
 	///	   - `StaffError.internalError`, `MeasureError.internalError` if the function has an internal implementation error.
 	///
-	public mutating func removeTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
+	public func removeTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
 		try modifyTieForNote(at: noteIndex, inMeasureAt: measureIndex, removeTie: true, inSet: setIndex)
 	}
 
@@ -261,7 +262,7 @@ public struct Staff: RandomAccessCollection {
 		return notesHolders[notesHolderIndex]
 	}
 
-	private mutating func modifyTieForNote(at noteIndex: Int, inMeasureAt measureIndex: Int, removeTie: Bool, inSet setIndex: Int) throws {
+	private func modifyTieForNote(at noteIndex: Int, inMeasureAt measureIndex: Int, removeTie: Bool, inSet setIndex: Int) throws {
 		let notesHolderIndex = try notesHolderIndexFromMeasureIndex(measureIndex)
 
 		// Ensure first measure information provided is valid for tie
@@ -313,7 +314,7 @@ public struct Staff: RandomAccessCollection {
 		return measureIndexes[index]
 	}
 
-	internal mutating func replaceMeasure(at measureIndex: Index, with newMeasure: Measure, shouldChangeClef: Bool) throws {
+	internal func replaceMeasure(at measureIndex: Index, with newMeasure: Measure, shouldChangeClef: Bool) throws {
 		var newMeasure = newMeasure
 		let oldMeasure = try? measure(at: measureIndex)
 		if shouldChangeClef {
@@ -340,7 +341,7 @@ public struct Staff: RandomAccessCollection {
 		notesHolders[notesHolderIndex] = newNotesHolder
 	}
 
-	private mutating func recomputeMeasureIndexes() {
+	private func recomputeMeasureIndexes() {
 		measureIndexes = []
 		for (index, notesHolder) in notesHolders.enumerated() {
 			switch notesHolder {
@@ -386,7 +387,7 @@ public struct Staff: RandomAccessCollection {
 		}
 	}
 
-	private mutating func propagateClefChange(_ clef: Clef, fromMeasureIndex measureIndex: Int) throws {
+	private func propagateClefChange(_ clef: Clef, fromMeasureIndex measureIndex: Int) throws {
 		// Modify every `originalClef` and `lastClef` that follows the measure until not needed
 		for index in (measureIndex + 1) ..< measureCount {
 			do {

@@ -26,7 +26,7 @@ public class Part {
 	public let name: String
     public let shortName: String
 
-    @Published internal private(set) var staves: [Staff] = []
+    @Published private(set) var staves: [Staff] = []
 
 	public init(
 		name: String = "",

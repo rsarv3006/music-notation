@@ -27,7 +27,7 @@ public class Staff: RandomAccessCollection {
 	public let instrument: Instrument
 	public private(set) var measureCount: Int = 0
 
-	@Published internal private(set) var notesHolders: [NotesHolder] = [] {
+	@Published private(set) var notesHolders: [NotesHolder] = [] {
 		didSet { recomputeMeasureIndexes() }
 	}
 

@@ -6,6 +6,8 @@
 //	Copyright © 2015 Kyle Sherman. All rights reserved.
 //
 
+import Foundation
+
 public class TimeSignature {
 	public var topNumber: Int
     public var bottomNumber: Int
@@ -36,3 +38,5 @@ extension TimeSignature: Equatable {
 		}
 	}
 }
+
+extension TimeSignature: ObservableObject {}

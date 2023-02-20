@@ -7,7 +7,7 @@
 //
 import Foundation
 
-public class Staff: RandomAccessCollection {
+public struct Staff: RandomAccessCollection {
 	// MARK: - Collection Conformance
 
 	public typealias Index = Int
@@ -27,7 +27,7 @@ public class Staff: RandomAccessCollection {
 	public let instrument: Instrument
 	public private(set) var measureCount: Int = 0
 
-	@Published public private(set) var notesHolders: [NotesHolder] = [] {
+	public private(set) var notesHolders: [NotesHolder] = [] {
 		didSet { recomputeMeasureIndexes() }
 	}
 
@@ -41,7 +41,7 @@ public class Staff: RandomAccessCollection {
 		self.instrument = instrument
 	}
 
-	public func appendMeasure(_ measure: Measure) {
+	public mutating func appendMeasure(_ measure: Measure) {
 		let measureBefore = try? self.measure(at: lastIndex)
 		let clefChange = measureBefore?.lastClef ?? clef
 		var measure = measure
@@ -50,7 +50,7 @@ public class Staff: RandomAccessCollection {
 		measureCount += measure.measureCount
 	}
 
-	public func appendRepeat(_ measureRepeat: MeasureRepeat) {
+	public mutating func appendRepeat(_ measureRepeat: MeasureRepeat) {
 		var measureRepeat = measureRepeat
 		let measureBefore = try? measure(at: lastIndex)
 		for index in measureRepeat.measures.indices {
@@ -72,7 +72,7 @@ public class Staff: RandomAccessCollection {
 	///	  - `StaffError.repeatedMeasureCannotBeModified` if the measure is a repeated measure.
 	///	  - `StaffError.internalError` if the function has an internal implementation error.
 	///
-	public func changeClef(
+	public mutating func changeClef(
 		_ clef: Clef,
 		in measureIndex: Int,
 		atNote noteIndex: Int,
@@ -113,7 +113,7 @@ public class Staff: RandomAccessCollection {
 	///	   - `MeasureRepeatError.indexOutOfRange`
 	///	   - `MeasureRepeatError.cannotModifyRepeatedMeasures`
 	///
-	public func insertMeasure(_ measure: Measure, at index: Int, beforeRepeat: Bool = true) throws {
+	public mutating func insertMeasure(_ measure: Measure, at index: Int, beforeRepeat: Bool = true) throws {
 		var measure = measure
 		let measureBefore = try? self.measure(at: index - 1)
 		let clefChange = measureBefore?.lastClef ?? clef
@@ -154,7 +154,7 @@ public class Staff: RandomAccessCollection {
 	///	   - `StaffError.measureIndexOutOfRange`
 	///	   - `StaffError.cannotInsertRepeatWhereOneAlreadyExists`
 	///
-	public func insertRepeat(_ measureRepeat: MeasureRepeat, at index: Int) throws {
+	public mutating func insertRepeat(_ measureRepeat: MeasureRepeat, at index: Int) throws {
 		var measureRepeat = measureRepeat
 		let measureBefore = try? measure(at: index - 1)
 		var didChangeClef = true
@@ -182,7 +182,7 @@ public class Staff: RandomAccessCollection {
 	///	   - `StaffError.repeatedMeasureCannotBeModified` if the measure is a repeated measure.
 	///	   - `StaffError.internalError` if index translation doesn't work properly.
 	///
-	public func replaceMeasure(at measureIndex: Int, with newMeasure: Measure) throws {
+	public mutating func replaceMeasure(at measureIndex: Int, with newMeasure: Measure) throws {
 		try replaceMeasure(at: measureIndex, with: newMeasure, shouldChangeClef: true)
 	}
 
@@ -202,7 +202,7 @@ public class Staff: RandomAccessCollection {
 	///	   - `StaffError.internalError`, `MeasureError.internalError` if the function has an internal implementation error.
 	///	   - `MeasureError.noteIndexOutOfRange`
 	///
-	public func startTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
+	public mutating func startTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
 		try modifyTieForNote(at: noteIndex, inMeasureAt: measureIndex, removeTie: false, inSet: setIndex)
 	}
 
@@ -222,7 +222,7 @@ public class Staff: RandomAccessCollection {
 	///	   - `MeasureError.noteIndexOutOfRange`
 	///	   - `StaffError.internalError`, `MeasureError.internalError` if the function has an internal implementation error.
 	///
-	public func removeTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
+	public mutating func removeTieFromNote(at noteIndex: Int, inMeasureAt measureIndex: Int, inSet setIndex: Int = 0) throws {
 		try modifyTieForNote(at: noteIndex, inMeasureAt: measureIndex, removeTie: true, inSet: setIndex)
 	}
 
@@ -262,7 +262,7 @@ public class Staff: RandomAccessCollection {
 		return notesHolders[notesHolderIndex]
 	}
 
-	private func modifyTieForNote(at noteIndex: Int, inMeasureAt measureIndex: Int, removeTie: Bool, inSet setIndex: Int) throws {
+	private mutating func modifyTieForNote(at noteIndex: Int, inMeasureAt measureIndex: Int, removeTie: Bool, inSet setIndex: Int) throws {
 		let notesHolderIndex = try notesHolderIndexFromMeasureIndex(measureIndex)
 
 		// Ensure first measure information provided is valid for tie
@@ -314,7 +314,7 @@ public class Staff: RandomAccessCollection {
 		return measureIndexes[index]
 	}
 
-	internal func replaceMeasure(at measureIndex: Index, with newMeasure: Measure, shouldChangeClef: Bool) throws {
+	internal mutating func replaceMeasure(at measureIndex: Index, with newMeasure: Measure, shouldChangeClef: Bool) throws {
 		var newMeasure = newMeasure
 		let oldMeasure = try? measure(at: measureIndex)
 		if shouldChangeClef {
@@ -341,7 +341,7 @@ public class Staff: RandomAccessCollection {
 		notesHolders[notesHolderIndex] = newNotesHolder
 	}
 
-	private func recomputeMeasureIndexes() {
+	private mutating func recomputeMeasureIndexes() {
 		measureIndexes = []
 		for (index, notesHolder) in notesHolders.enumerated() {
 			switch notesHolder {
@@ -387,7 +387,7 @@ public class Staff: RandomAccessCollection {
 		}
 	}
 
-	private func propagateClefChange(_ clef: Clef, fromMeasureIndex measureIndex: Int) throws {
+	private mutating func propagateClefChange(_ clef: Clef, fromMeasureIndex measureIndex: Int) throws {
 		// Modify every `originalClef` and `lastClef` that follows the measure until not needed
 		for index in (measureIndex + 1) ..< measureCount {
 			do {

@@ -6,10 +6,8 @@
 //	Copyright © 2021 Steven Woolgar. All rights reserved.
 //
 
-import Foundation
-
 /// Placeholder for eventual staff layout description of a page footer.
-public class Part {
+public struct Part {
 	// MARK: - Collection Conformance
 
 	public typealias Index = Int
@@ -23,10 +21,10 @@ public class Part {
 
 	// MARK: - Main Properties
 
-	public let name: String
-    public let shortName: String
+    public var name: String
+    public var shortName: String
 
-    @Published public private(set) var staves: [Staff] = []
+    public var staves: [Staff] = []
 
 	public init(
 		name: String = "",
@@ -37,6 +35,10 @@ public class Part {
         self.name = name
         self.shortName = shortName
 	}
+    
+    public mutating func replaceStaff(with staff: Staff, at index: Int) {
+        self.staves.replaceSubrange(index...index, with: [staff])
+    }
 }
 
 extension Part: CustomDebugStringConvertible {
@@ -47,4 +49,3 @@ extension Part: CustomDebugStringConvertible {
 	}
 }
 
-extension Part: ObservableObject {}

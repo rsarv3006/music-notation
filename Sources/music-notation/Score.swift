@@ -24,7 +24,7 @@ public class Score: RandomAccessCollection {
 
 	// MARK: - Main Properties
 
-    @Published public private(set) var parts: [Part] = []
+    @Published public var parts: [Part] = []
 	@Published public var title: String = ""
     @Published public var subTitle: String = ""
     @Published public var artist: String = ""

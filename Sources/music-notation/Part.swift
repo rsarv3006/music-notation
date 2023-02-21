@@ -35,10 +35,10 @@ public struct Part {
         self.name = name
         self.shortName = shortName
 	}
-    
-    public mutating func replaceStaff(with staff: Staff, at index: Int) {
-        self.staves.replaceSubrange(index...index, with: [staff])
-    }
+}
+
+public enum PartError: Error {
+    case staffIndexOutOfRange
 }
 
 extension Part: CustomDebugStringConvertible {
